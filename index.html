@@ -177,8 +177,9 @@
     footer p{margin:4px 0}
 
     /* Sticky mobile CTA */
-    .sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(252,248,242,.96);backdrop-filter:blur(8px);padding:10px 16px;box-shadow:0 -6px 20px rgba(0,0,0,.08);display:none;z-index:50}
-    .sticky .btn{width:100%;padding:14px 20px}
+    .sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(252,248,242,.96);backdrop-filter:blur(8px);padding:7px 16px;box-shadow:0 -6px 20px rgba(0,0,0,.08);display:none;z-index:50;transform:translateY(110%);transition:transform .3s ease}
+    .sticky.visible{transform:none}
+    .sticky .btn{width:100%;padding:10px 18px;font-size:.92rem}
 
     @media (max-width:860px){
       .hero .wrap,.author .wrap{grid-template-columns:1fr;gap:32px}
@@ -483,6 +484,26 @@
         }
       });
     });
+
+    // Barra flotante (solo celular): aparece después del primer botón y se esconde
+    // cuando hay otro botón de WhatsApp a la vista o al llegar al final de la página.
+    (function(){
+      var barra = document.querySelector('.sticky');
+      var primero = document.querySelector('a[data-cta="hero"]');
+      var otros = document.querySelectorAll('a[data-cta]:not([data-cta="sticky"])');
+      var pie = document.querySelector('footer');
+      if (!barra || !primero) return;
+      function enPantalla(el){ var r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }
+      function actualizar(){
+        var paso = primero.getBoundingClientRect().bottom < 0;
+        var hayOtro = Array.prototype.some.call(otros, enPantalla);
+        var alFinal = pie && pie.getBoundingClientRect().top < innerHeight;
+        barra.classList.toggle('visible', paso && !hayOtro && !alFinal);
+      }
+      addEventListener('scroll', actualizar, { passive: true });
+      addEventListener('resize', actualizar);
+      actualizar();
+    })();
   </script>
 </body>
 </html>
